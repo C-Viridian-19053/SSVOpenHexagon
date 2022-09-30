@@ -633,6 +633,9 @@ void HexagonGame::newGame(const std::string& mPackId, const std::string& mId,
 
     debugPause = false;
 
+    // Font cleanup
+    messageText.setFont(font);
+
     // Events cleanup
     messageText.setString("");
     pbText.setString("");
@@ -700,6 +703,7 @@ void HexagonGame::newGame(const std::string& mPackId, const std::string& mId,
     inputImplCCW = inputImplCW = false;
     playerNowReadyToSwap = false;
 
+    if(!firstPlay) runLuaFunctionIfExists<void>("onPreUnload");
     lua = Lua::LuaContext{};
     calledDeprecatedFunctions.clear();
     initLua();
@@ -754,16 +758,16 @@ void HexagonGame::newGame(const std::string& mPackId, const std::string& mId,
         {
             status.restartInput += " OR JOYSTICK " + joystickButton;
         }
-        status.restartInput = "PRESS " + status.restartInput + " TO RESTART\n";
+        status.restartInput = "YOU DIED! PRESS " + status.restartInput + " TO RESTART!\n";
     }
     else if(!joystickButton.empty())
     {
         status.restartInput =
-            "PRESS JOYSTICK " + joystickButton + " TO RESTART\n";
+            "YOU DIED! PRESS JOYSTICK " + joystickButton + " TO RESTART!\n";
     }
     else
     {
-        status.restartInput = "NO RESTART BUTTON SET\n";
+        status.restartInput = "YOU DIED! BUT NO RESTART BUTTON SET...\n";
     }
     joystickButton = Config::getJoystickBindNames(Joystick::Jid::Replay);
     if(!status.replayInput.empty())
@@ -772,16 +776,16 @@ void HexagonGame::newGame(const std::string& mPackId, const std::string& mId,
         {
             status.replayInput += " OR JOYSTICK " + joystickButton;
         }
-        status.replayInput = "PRESS " + status.replayInput + " TO REPLAY\n";
+        status.replayInput = "PRESS " + status.replayInput + " TO REPLAY.\n";
     }
     else if(!joystickButton.empty())
     {
         status.replayInput =
-            "PRESS JOYSTICK " + joystickButton + " TO REPLAY\n";
+            "PRESS JOYSTICK " + joystickButton + " TO REPLAY.\n";
     }
     else
     {
-        status.replayInput = "NO REPLAY BUTTON SET\n";
+        status.replayInput = "NO REPLAY BUTTON SET...\n";
     }
 }
 
@@ -900,7 +904,10 @@ void HexagonGame::death_saveScoreIfNeededAndShowPBEffects()
 
     SSVOH_ASSERT(r == SaveScoreIfNeededResult::PersonalBest);
 
-    pbText.setString("NEW PERSONAL BEST!");
+    // pbText.setString("NEW PERSONAL BEST!");
+    // pbText.setString("N E W   P E R S O N A L   B E S T ! ! 1");
+    // pbText.setString("PERSONAL BEST OR SOMETHING\nWORDS ARE HARD");
+    pbText.setString("pbText.setString(\"pbText.setString(\\\"NEW PERSONAL BEST!\\\");\");");
     mustSpawnPBParticles = true;
 
     playSoundAbort("personalBest.ogg");
